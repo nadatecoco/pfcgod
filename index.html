@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 20px;
             background-color: #f5f5f5;
@@ -73,10 +73,23 @@
             font-weight: bold;
             color: #333;
         }
+        .calorie-info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
     <h1>かんたん PFC チェッカー</h1>
+    
+    <div class="calorie-info">
+        <strong>カロリー計算について：</strong><br>
+        たんぱく質: 4kcal/g | 脂質: 9kcal/g | 炭水化物: 4kcal/g
+    </div>
     
     <div class="input-section">
         <select id="foodSelect">
@@ -92,6 +105,7 @@
                 <th>たんぱく質 (P)</th>
                 <th>脂質 (F)</th>
                 <th>炭水化物 (C)</th>
+                <th>カロリー</th>
             </tr>
         </thead>
         <tbody id="foodTableBody">
@@ -100,7 +114,7 @@
 
     <div class="total-section">
         <div class="total-display" id="totalDisplay">
-            今日の合計： P 0g / F 0g / C 0g
+            今日の合計： P 0g / F 0g / C 0g / カロリー 0kcal
         </div>
     </div>
 
@@ -110,13 +124,25 @@
             "鶏むね肉":   { P: 23, F: 1.9, C: 0 },
             "卵":        { P: 6.2, F: 5.2, C: 0.2 },
             "ブロッコリー": { P: 3.6, F: 0.4, C: 7.2 },
-            "ごはん":     { P: 2.5, F: 0.3, C: 37.1 }
+            "ごはん":     { P: 2.5, F: 0.3, C: 37.1 },
+            "鮭":        { P: 20.4, F: 6.3, C: 0 },
+            "豆腐":      { P: 6.6, F: 4.2, C: 1.2 },
+            "納豆":      { P: 16.5, F: 10.0, C: 12.1 },
+            "玄米":      { P: 2.8, F: 1.0, C: 35.6 },
+            "さつまいも": { P: 1.4, F: 0.2, C: 30.3 },
+            "アボカド":   { P: 2.0, F: 18.7, C: 6.0 }
         };
 
         // 合計PFCを管理する変数
         let totalP = 0;
         let totalF = 0;
         let totalC = 0;
+        let totalCalories = 0;
+
+        // カロリー計算関数
+        function calculateCalories(p, f, c) {
+            return (p * 4) + (f * 9) + (c * 4);
+        }
 
         // ページ読み込み時の初期化
         window.onload = function() {
@@ -147,19 +173,20 @@
             }
 
             const food = foodData[selectedFood];
+            const calories = calculateCalories(food.P, food.F, food.C);
             
             // テーブルに行を追加
-            addTableRow(selectedFood, food.P, food.F, food.C);
+            addTableRow(selectedFood, food.P, food.F, food.C, calories);
             
             // 合計を更新
-            updateTotal(food.P, food.F, food.C);
+            updateTotal(food.P, food.F, food.C, calories);
             
             // 選択をリセット
             select.value = '';
         }
 
         // テーブルに行を追加
-        function addTableRow(foodName, p, f, c) {
+        function addTableRow(foodName, p, f, c, calories) {
             const tbody = document.getElementById('foodTableBody');
             const row = tbody.insertRow();
             
@@ -167,17 +194,19 @@
             row.insertCell(1).textContent = p + 'g';
             row.insertCell(2).textContent = f + 'g';
             row.insertCell(3).textContent = c + 'g';
+            row.insertCell(4).textContent = Math.round(calories) + 'kcal';
         }
 
         // 合計を更新
-        function updateTotal(p, f, c) {
+        function updateTotal(p, f, c, calories) {
             totalP += p;
             totalF += f;
             totalC += c;
+            totalCalories += calories;
             
             // 表示を更新
             document.getElementById('totalDisplay').textContent = 
-                `今日の合計： P ${totalP.toFixed(1)}g / F ${totalF.toFixed(1)}g / C ${totalC.toFixed(1)}g`;
+                `今日の合計： P ${totalP.toFixed(1)}g / F ${totalF.toFixed(1)}g / C ${totalC.toFixed(1)}g / カロリー ${Math.round(totalCalories)}kcal`;
         }
     </script>
 </body>
