@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>かんたん PFC チェッカー</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .input-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+            min-width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .total-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .total-display {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>かんたん PFC チェッカー</h1>
+    
+    <div class="input-section">
+        <select id="foodSelect">
+            <option value="">食材を選択してください</option>
+        </select>
+        <button onclick="addFood()">追加</button>
+    </div>
+
+    <table id="foodTable">
+        <thead>
+            <tr>
+                <th>食材名</th>
+                <th>たんぱく質 (P)</th>
+                <th>脂質 (F)</th>
+                <th>炭水化物 (C)</th>
+            </tr>
+        </thead>
+        <tbody id="foodTableBody">
+        </tbody>
+    </table>
+
+    <div class="total-section">
+        <div class="total-display" id="totalDisplay">
+            今日の合計： P 0g / F 0g / C 0g
+        </div>
+    </div>
+
+    <script>
+        // 食材データ
+        const foodData = {
+            "鶏むね肉":   { P: 23, F: 1.9, C: 0 },
+            "卵":        { P: 6.2, F: 5.2, C: 0.2 },
+            "ブロッコリー": { P: 3.6, F: 0.4, C: 7.2 },
+            "ごはん":     { P: 2.5, F: 0.3, C: 37.1 }
+        };
+
+        // 合計PFCを管理する変数
+        let totalP = 0;
+        let totalF = 0;
+        let totalC = 0;
+
+        // ページ読み込み時の初期化
+        window.onload = function() {
+            initializeFoodSelect();
+        };
+
+        // 食材選択肢を初期化
+        function initializeFoodSelect() {
+            const select = document.getElementById('foodSelect');
+            
+            // 食材データから選択肢を作成
+            for (let foodName in foodData) {
+                const option = document.createElement('option');
+                option.value = foodName;
+                option.textContent = foodName;
+                select.appendChild(option);
+            }
+        }
+
+        // 食材を追加
+        function addFood() {
+            const select = document.getElementById('foodSelect');
+            const selectedFood = select.value;
+            
+            if (!selectedFood) {
+                alert('食材を選択してください');
+                return;
+            }
+
+            const food = foodData[selectedFood];
+            
+            // テーブルに行を追加
+            addTableRow(selectedFood, food.P, food.F, food.C);
+            
+            // 合計を更新
+            updateTotal(food.P, food.F, food.C);
+            
+            // 選択をリセット
+            select.value = '';
+        }
+
+        // テーブルに行を追加
+        function addTableRow(foodName, p, f, c) {
+            const tbody = document.getElementById('foodTableBody');
+            const row = tbody.insertRow();
+            
+            row.insertCell(0).textContent = foodName;
+            row.insertCell(1).textContent = p + 'g';
+            row.insertCell(2).textContent = f + 'g';
+            row.insertCell(3).textContent = c + 'g';
+        }
+
+        // 合計を更新
+        function updateTotal(p, f, c) {
+            totalP += p;
+            totalF += f;
+            totalC += c;
+            
+            // 表示を更新
+            document.getElementById('totalDisplay').textContent = 
+                `今日の合計： P ${totalP.toFixed(1)}g / F ${totalF.toFixed(1)}g / C ${totalC.toFixed(1)}g`;
+        }
+    </script>
+</body>
+</html> 
