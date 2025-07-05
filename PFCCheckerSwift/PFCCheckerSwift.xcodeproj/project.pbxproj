@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		412D97352E18FC7400131F66 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 412D97332E18FC7400131F66 /* Model.xcdatamodeld */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		412D96EB2E18F45900131F66 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		412D96DD2E18F45800131F66 /* PFCCheckerSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PFCCheckerSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		412D96EA2E18F45900131F66 /* PFCCheckerSwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PFCCheckerSwiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		412D96F42E18F45900131F66 /* PFCCheckerSwiftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PFCCheckerSwiftUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		412D97342E18FC7400131F66 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +80,7 @@
 		412D96D42E18F45800131F66 = {
 			isa = PBXGroup;
 			children = (
+				412D97332E18FC7400131F66 /* Model.xcdatamodeld */,
 				412D96DF2E18F45800131F66 /* PFCCheckerSwift */,
 				412D96ED2E18F45900131F66 /* PFCCheckerSwiftTests */,
 				412D96F72E18F45900131F66 /* PFCCheckerSwiftUITests */,
@@ -236,6 +242,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				412D97352E18FC7400131F66 /* Model.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -550,6 +557,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		412D97332E18FC7400131F66 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				412D97342E18FC7400131F66 /* Model.xcdatamodel */,
+			);
+			currentVersion = 412D97342E18FC7400131F66 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 412D96D52E18F45800131F66 /* Project object */;
 }
