@@ -12,28 +12,66 @@ class FoodEntryStore: ObservableObject {
     }
     
     func fetchFoodEntries() {
-        let request: NSFetchRequest<FoodEntry> = FoodEntry.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(keyPath: \FoodEntry.timestamp, ascending: false)]
+        let request: NSFetchRequest<FoodEntryEntity> = FoodEntryEntity.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(keyPath: \FoodEntryEntity.timestamp, ascending: false)]
         
         do {
-            foodEntries = try viewContext.fetch(request)
+            let fetchedEntities = try viewContext.fetch(request)
+            self.foodEntries = fetchedEntities.map { entity in
+                // FoodEntityからFood structへの変換
+                let food = Food(id: entity.food?.objectID.uriRepresentation().uuid() ?? UUID(),
+                                name: entity.food?.name ?? "",
+                                protein: entity.food?.protein ?? 0,
+                                fat: entity.food?.fat ?? 0,
+                                carbs: entity.food?.carbs ?? 0,
+                                calories: entity.food?.calories ?? 0)
+                
+                return FoodEntry(id: entity.objectID.uriRepresentation().uuid(),
+                                 food: food,
+                                 quantity: entity.quantity,
+                                 timestamp: entity.timestamp ?? Date())
+            }
         } catch {
             print("Error fetching food entries: \(error)")
         }
     }
     
     func addFoodEntry(food: Food, quantity: Int16) {
-        let newEntry = FoodEntry(context: viewContext)
-        newEntry.food = food
-        newEntry.quantity = quantity
-        newEntry.timestamp = Date()
+        let newEntryEntity = FoodEntryEntity(context: viewContext)
         
-        saveContext()
+        // Food structから対応するFoodEntityを検索して関連付ける
+        let foodRequest: NSFetchRequest<FoodEntity> = FoodEntity.fetchRequest()
+        foodRequest.predicate = NSPredicate(format: "name == %@", food.name)
+        
+        do {
+            let fetchedFoods = try viewContext.fetch(foodRequest)
+            if let foodEntity = fetchedFoods.first {
+                newEntryEntity.food = foodEntity
+                newEntryEntity.quantity = quantity
+                newEntryEntity.timestamp = Date()
+                
+                saveContext()
+            } else {
+                print("Error: Food entity not found for name \(food.name)")
+            }
+        } catch {
+            print("Error fetching food entity for addFoodEntry: \(error)")
+        }
     }
     
     func deleteFoodEntry(_ foodEntry: FoodEntry) {
-        viewContext.delete(foodEntry)
-        saveContext()
+        let request: NSFetchRequest<FoodEntryEntity> = FoodEntryEntity.fetchRequest()
+        request.predicate = NSPredicate(format: "timestamp == %@ AND quantity == %d", foodEntry.timestamp as NSDate, foodEntry.quantity)
+        
+        do {
+            let fetchedEntities = try viewContext.fetch(request)
+            if let entityToDelete = fetchedEntities.first {
+                viewContext.delete(entityToDelete)
+                saveContext()
+            }
+        } catch {
+            print("Error deleting food entry: \(error)")
+        }
     }
     
     func getTodayEntries() -> [FoodEntry] {
@@ -42,8 +80,7 @@ class FoodEntryStore: ObservableObject {
         let tomorrow = calendar.date(byAdding: .day, value: 1, to: today)!
         
         return foodEntries.filter { entry in
-            guard let timestamp = entry.timestamp else { return false }
-            return timestamp >= today && timestamp < tomorrow
+            return entry.timestamp >= today && entry.timestamp < tomorrow
         }
     }
     
@@ -55,13 +92,10 @@ class FoodEntryStore: ObservableObject {
         var totalK = 0.0
         
         for entry in todayEntries {
-            guard let food = entry.food else { continue }
-            let quantity = Double(entry.quantity)
-            
-            totalP += food.protein * quantity / 100.0
-            totalF += food.fat * quantity / 100.0
-            totalC += food.carb * quantity / 100.0
-            totalK += food.calorie * quantity / 100.0
+            totalP += entry.food.protein
+            totalF += entry.food.fat
+            totalC += entry.food.carbs
+            totalK += entry.food.calories
         }
         
         return (totalP, totalF, totalC, totalK)

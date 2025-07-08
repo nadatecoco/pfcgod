@@ -1,50 +1,57 @@
 import SwiftUI
 
 struct ProgressRow: View {
-    let totalP: Double
-    let totalF: Double
-    let totalC: Double
-    let totalK: Double
-    
+    // 目標値（仮） - 将来的にはユーザーが設定できるようにすると良い
+    private let targetP: Double = 120 // g
+    private let targetF: Double = 60  // g
+    private let targetC: Double = 250 // g
+    private let targetK: Double = 2000 // kcal
+
+    var totalP: Double
+    var totalF: Double
+    var totalC: Double
+    var totalK: Double
+
     var body: some View {
         VStack(spacing: 8) {
-            // 上段：合計ラベル
-            Text("P \(Int(totalP))g / F \(Int(totalF))g / C \(Int(totalC))g / K \(Int(totalK))kcal")
-                .font(.headline)
-                .padding(.horizontal)
-            
-            // 下段：4分割プログレスバー
-            HStack(spacing: 2) {
-                // P - 青
-                Rectangle()
-                    .fill(Color.blue)
-                    .frame(height: 8)
-                    .frame(maxWidth: .infinity)
-                
-                // F - 赤
-                Rectangle()
-                    .fill(Color.red)
-                    .frame(height: 8)
-                    .frame(maxWidth: .infinity)
-                
-                // C - オレンジ
-                Rectangle()
-                    .fill(Color.orange)
-                    .frame(height: 8)
-                    .frame(maxWidth: .infinity)
-                
-                // K - 緑
-                Rectangle()
-                    .fill(Color.green)
-                    .frame(height: 8)
-                    .frame(maxWidth: .infinity)
-            }
-            .padding(.horizontal)
+            ProgressBar(value: totalP, target: targetP, label: "P", color: .blue)
+            ProgressBar(value: totalF, target: targetF, label: "F", color: .red)
+            ProgressBar(value: totalC, target: targetC, label: "C", color: .orange)
+            ProgressBar(value: totalK, target: targetK, label: "K", color: .green)
         }
+        .padding(.horizontal)
     }
 }
 
-#Preview {
-    ProgressRow(totalP: 25, totalF: 8, totalC: 60, totalK: 450)
-        .padding()
+struct ProgressBar: View {
+    var value: Double
+    var target: Double
+    var label: String
+    var color: Color
+
+    private var progress: CGFloat {
+        if target == 0 { return 0 }
+        return min(CGFloat(value / target), 1.0) // 100%を上限
+    }
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.headline)
+                .frame(width: 20, alignment: .leading)
+            
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    Rectangle()
+                        .foregroundColor(color.opacity(0.2))
+                        .frame(height: 8)
+                    Rectangle()
+                        .foregroundColor(color)
+                        .frame(width: geometry.size.width * progress, height: 8)
+                }
+                .cornerRadius(4)
+            }
+            .frame(height: 8)
+        }
+    }
 }
